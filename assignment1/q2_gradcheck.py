@@ -25,13 +25,12 @@ def gradcheck_naive(f, x):
         ix = it.multi_index
 
         # Try modifying x[ix] with h defined above to compute
-        # numerical gradients. Make sure you call random.setstate(rndstate)
-        # before calling f(x) each time. This will make it possible
-        # to test cost functions with built in randomness later.
-
-        ### YOUR CODE HERE:
-        raise NotImplementedError
-        ### END YOUR CODE
+        # numerical gradients. Make sure you call random.setstate(rndstate) ??
+        # before calling f(x) each time. This will make it possible ??????????
+        # to test cost functions with built in randomness later. ?????????????
+        
+        random.setstate(rndstate) # ???
+        numgrad = (f(x[ix] + h)[0] - f(x[ix] - h)[0]) / (2 * h)
 
         # Compare gradients
         reldiff = abs(numgrad - grad[ix]) / max(1, abs(numgrad), abs(grad[ix]))
@@ -69,7 +68,7 @@ def your_sanity_checks():
     """
     print "Running your sanity checks..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # raise NotImplementedError
     ### END YOUR CODE
 
 
