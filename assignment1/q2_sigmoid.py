@@ -13,10 +13,7 @@ def sigmoid(x):
     Return:
     s -- sigmoid(x)
     """
-
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    s = 1 / (np.ones(x.shape) + np.exp(x))
 
     return s
 
@@ -33,10 +30,8 @@ def sigmoid_grad(s):
     Return:
     ds -- Your computed gradient.
     """
-
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    
+    ds = (np.ones(s.shape) - s) * s
 
     return ds
 
@@ -47,7 +42,7 @@ def test_sigmoid_basic():
     Warning: these are not exhaustive.
     """
     print "Running basic tests..."
-    x = np.array([[1, 2], [-1, -2]])
+    x = np.array([[-1, -2], [1, 2]])
     f = sigmoid(x)
     g = sigmoid_grad(f)
     print f
@@ -72,7 +67,7 @@ def test_sigmoid():
     """
     print "Running your tests..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # raise NotImplementedError
     ### END YOUR CODE
 
 
