@@ -1,40 +1,29 @@
-#!/usr/bin/env python
-
 import numpy as np
-
 
 def sigmoid(x):
     """
     Compute the sigmoid function for the input here.
-
-    Arguments:
-    x -- A scalar or numpy array.
-
-    Return:
-    s -- sigmoid(x)
     """
-    s = 1 / (np.ones(x.shape) + np.exp(-x))
 
-    return s
+    g = 1 + np.exp(-x)
+    a = 1/g
 
+    return a
 
-def sigmoid_grad(s):
+def sigmoid_grad(f):
     """
     Compute the gradient for the sigmoid function here. Note that
-    for this implementation, the input s should be the sigmoid
+    for this implementation, the input f should be the sigmoid
     function value of your original input x.
-
-    Arguments:
-    s -- A scalar or numpy array.
-
-    Return:
-    ds -- Your computed gradient.
     """
-    
-    ds = np.multiply((1 - s), s)
 
-    return ds
+    d = np.multiply(f,(1 - f))
 
+    ### YOUR CODE HERE
+    # raise NotImplementedError
+    ### END YOUR CODE
+
+    return d
 
 def test_sigmoid_basic():
     """
@@ -46,17 +35,12 @@ def test_sigmoid_basic():
     f = sigmoid(x)
     g = sigmoid_grad(f)
     print f
-    f_ans = np.array([
-        [0.73105858, 0.88079708],
-        [0.26894142, 0.11920292]])
-    assert np.allclose(f, f_ans, rtol=1e-05, atol=1e-06)
+    assert np.amax(f - np.array([[0.73105858, 0.88079708],
+        [0.26894142, 0.11920292]])) <= 1e-6
     print g
-    g_ans = np.array([
-        [0.19661193, 0.10499359],
-        [0.19661193, 0.10499359]])
-    assert np.allclose(g, g_ans, rtol=1e-05, atol=1e-06)
-    print "You should verify these results by hand!\n"
-
+    assert np.amax(g - np.array([[0.19661193, 0.10499359],
+        [0.19661193, 0.10499359]])) <= 1e-6
+    print "You should verify these results!\n"
 
 def test_sigmoid():
     """
@@ -69,7 +53,6 @@ def test_sigmoid():
     ### YOUR CODE HERE
     # raise NotImplementedError
     ### END YOUR CODE
-
 
 if __name__ == "__main__":
     test_sigmoid_basic();

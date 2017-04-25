@@ -31,8 +31,9 @@ def softmax(x):
     if len(x.shape) > 1:
         x = (x.T - x.max(1)).T
         num = np.exp(x)
-        den_vec = num.sum(1)
-        x = num/den_vec
+        print x.shape[0]
+        den_vec = np.reshape(num.sum(1), (x.shape[0], 1))
+        x = num / den_vec
     else:
         num = np.exp(x)
         den = num.sum()
