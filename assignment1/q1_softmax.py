@@ -35,7 +35,7 @@ def softmax(x):
         den_vec = np.reshape(num.sum(1), (x.shape[0], 1))
         x = num / den_vec
     else:
-        num = np.exp(x)
+        num = np.exp(x - x.max())
         den = num.sum()
         x = num/den
 
