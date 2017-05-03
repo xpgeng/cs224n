@@ -51,7 +51,7 @@ class StanfordSentiment:
             return self._sentences
 
         sentences = []
-        with open(self.path + "/datasetSentences.txt", "r") as f:
+        with open(self.path + "/^datasetSentences.txt", "r") as f:
             first = True
             for line in f:
                 if first:
@@ -116,7 +116,7 @@ class StanfordSentiment:
 
         dictionary = dict()
         phrases = 0
-        with open(self.path + "/dictionary.txt", "r") as f:
+        with open(self.path + "/^dictionary.txt", "r") as f:
             for line in f:
                 line = line.strip()
                 if not line: continue
@@ -125,7 +125,7 @@ class StanfordSentiment:
                 phrases += 1
 
         labels = [0.0] * phrases
-        with open(self.path + "/sentiment_labels.txt", "r") as f:
+        with open(self.path + "/^sentiment_labels.txt", "r") as f:
             first = True
             for line in f:
                 if first:
@@ -152,7 +152,7 @@ class StanfordSentiment:
             return self._split
 
         split = [[] for i in xrange(3)]
-        with open(self.path + "/datasetSplit.txt", "r") as f:
+        with open(self.path + "/^datasetSplit.txt", "r") as f:
             first = True
             for line in f:
                 if first:
