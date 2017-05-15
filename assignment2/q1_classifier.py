@@ -44,8 +44,8 @@ class SoftmaxModel(Model):
             self.input_placeholder
             self.labels_placeholder
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        self.input_placeholder = tf.placeholder(tf.float32, [self.config.batch_size, self.config.n_features])
+        self.labels_placeholder = tf.placeholder(tf.int32, [self.config.batch_size, self.config.n_classes])
 
     def create_feed_dict(self, inputs_batch, labels_batch=None):
         """Creates the feed_dict for training the given step.
@@ -67,8 +67,7 @@ class SoftmaxModel(Model):
         Returns:
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        feed_dict = {self.input_placeholder: inputs_batch, self.labels_placeholder: labels_batch}
         return feed_dict
 
     def add_prediction_op(self):
@@ -87,8 +86,11 @@ class SoftmaxModel(Model):
         Returns:
             pred: A tensor of shape (batch_size, n_classes)
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        with tf.variable_scope("linear-transform"):
+            weight = tf.Variable(tf.fill([self.config.n_features, self.config.n_classes], 0.0))
+            bias = tf.Variable(tf.fill([self.config.n_classes], 0.0))
+            z = tf.matmul(self.input_placeholder, weight) + bias
+            pred = softmax(z)
         return pred
 
     def add_loss_op(self, pred):
@@ -101,8 +103,7 @@ class SoftmaxModel(Model):
         Returns:
             loss: A 0-d tensor (scalar)
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        loss = cross_entropy_loss(self.labels_placeholder, pred)
         return loss
 
     def add_training_op(self, loss):
@@ -124,8 +125,7 @@ class SoftmaxModel(Model):
         Returns:
             train_op: The Op for training.
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        train_op = tf.train.GradientDescentOptimizer(self.config.lr).minimize(loss)
         return train_op
 
     def run_epoch(self, sess, inputs, labels):
