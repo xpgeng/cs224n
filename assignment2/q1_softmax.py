@@ -22,9 +22,11 @@ def softmax(x):
         out: tf.Tensor with shape (n_sample, n_features). You need to construct this
                   tensor in this problem.
     """
-
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    row_max = tf.reduce_max(x, 1)
+    x_tr = tf.subtract(x, tf.transpose(tf.expand_dims(row_max, 0)))
+    x_tr_exp = tf.exp(x_tr)
+    den = tf.reduce_sum(x_tr_exp, 1)
+    out = x_tr_exp / tf.transpose(tf.expand_dims(den, 0))
 
     return out
 
@@ -53,8 +55,10 @@ def cross_entropy_loss(y, yhat):
                     tensor in the problem.
     """
 
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    multi = tf.multiply(tf.to_float(y), yhat)
+    _sum = tf.reduce_sum(multi, 1)
+    log_sum = - tf.log(_sum)
+    out = tf.reduce_sum(log_sum)
 
     return out
 
