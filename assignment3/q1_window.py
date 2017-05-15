@@ -93,12 +93,17 @@ def make_windowed_data(data, start, end, window_size = 1):
          ...
          ]
     """
-
     windowed_data = []
     for sentence, labels in data:
     ### YOUR CODE HERE (5-20 lines)
-
-    ### END YOUR CODE
+        start_sent_end = [start] * window_size + sentence + [end] * window_size
+        for word in sentence:
+            orig_idx = sentence.index(word)
+            idx = orig_idx + window_size
+            _from = idx - window_size
+            _to = idx + window_size + 1
+            word_list = [item for vec in start_sent_end[_from:_to] for item in vec]
+            windowed_data.append((word_list, labels[orig_idx]))
     return windowed_data
 
 class WindowModel(NERModel):
