@@ -87,7 +87,8 @@ class SequencePredictor(Model):
 
         x = self.inputs_placeholder
         ### YOUR CODE HERE (~2-3 lines)
-        ### END YOUR CODE
+        _, state = tf.nn.dynamic_rnn(cell, x, dtype=tf.float32)
+        preds = tf.nn.sigmoid(state)
 
         return preds #state # preds
 
@@ -108,8 +109,7 @@ class SequencePredictor(Model):
         y = self.labels_placeholder
 
         ### YOUR CODE HERE (~1-2 lines)
-
-        ### END YOUR CODE
+        loss = tf.reduce_mean(tf.nn.l2_loss(y - preds))
 
         return loss
 

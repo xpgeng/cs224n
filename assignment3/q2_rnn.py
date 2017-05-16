@@ -145,7 +145,10 @@ class RNNModel(NERModel):
         (Don't change the variable names)
         """
         ### YOUR CODE HERE (~4-6 lines)
-        ### END YOUR CODE
+        self.input_placeholder = tf.placeholder(tf.int32, [None, self.max_length, self.config.n_features])
+        self.labels_placeholder = tf.placeholder(tf.int32, [None, self.max_length])
+        self.mask_placeholder = tf.placeholder(tf.bool, [None, self.max_length])
+        self.dropout_placeholder = tf.placeholder(tf.float32)
 
     def create_feed_dict(self, inputs_batch, mask_batch, labels_batch=None, dropout=1):
         """Creates the feed_dict for the dependency parser.
@@ -170,7 +173,12 @@ class RNNModel(NERModel):
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
         ### YOUR CODE (~6-10 lines)
-        ### END YOUR CODE
+        feed_dict = {self.input_placeholder: inputs_batch,
+                     self.mask_placeholder: mask_batch,
+                     self.dropout_placeholder: dropout}
+        if labels_batch is not None:
+            feed_dict[self.labels_placeholder] = labels_batch
+
         return feed_dict
 
     def add_embedding(self):
@@ -194,7 +202,10 @@ class RNNModel(NERModel):
             embeddings: tf.Tensor of shape (None, max_length, n_features*embed_size)
         """
         ### YOUR CODE HERE (~4-6 lines)
-        ### END YOUR CODE
+        embedding = tf.Variable(self.pretrained_embeddings)
+        emb_lookup = tf.nn.embedding_lookup(embedding, self.input_placeholder)
+        embeddings = tf.reshape(emb_lookup, [-1, self.max_length, self.config.n_features*self.config.embed_size])
+
         return embeddings
 
     def add_prediction_op(self):
@@ -255,17 +266,25 @@ class RNNModel(NERModel):
         # Define U and b2 as variables.
         # Initialize state as vector of zeros.
         ### YOUR CODE HERE (~4-6 lines)
-        ### END YOUR CODE
+        U = tf.get_variable('U', [self.config.hidden_size, self.config.n_classes], tf.float32, 
+                            tf.contrib.layers.xavier_initializer())
+        b_2 = tf.get_variable('b_2', [self.config.n_classes], 
+                              tf.float32, tf.constant_initializer(0))
+        h = tf.zeros((tf.shape(x)[0], self.config.hidden_size))
 
         with tf.variable_scope("RNN"):
             for time_step in range(self.max_length):
                 ### YOUR CODE HERE (~6-10 lines)
-                pass
-                ### END YOUR CODE
+                if time_step != 0:
+                    tf.get_variable_scope().reuse_variables()
+                o_t, h = cell(x[:,time_step,:], h)
+                o_drop_t = tf.nn.dropout(o_t, dropout_rate)
+                y_t = tf.matmul(o_drop_t, U) + b_2
+                preds.append(y_t)
 
         # Make sure to reshape @preds here.
         ### YOUR CODE HERE (~2-4 lines)
-        ### END YOUR CODE
+        preds = tf.stack(preds, axis=1)
 
         assert preds.get_shape().as_list() == [None, self.max_length, self.config.n_classes], "predictions are not of the right shape. Expected {}, got {}".format([None, self.max_length, self.config.n_classes], preds.get_shape().as_list())
         return preds
@@ -286,7 +305,8 @@ class RNNModel(NERModel):
             loss: A 0-d tensor (scalar)
         """
         ### YOUR CODE HERE (~2-4 lines)
-        ### END YOUR CODE
+        raw_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=preds, labels=self.labels_placeholder)
+        loss = tf.reduce_mean(tf.boolean_mask(raw_loss, self.mask_placeholder))
         return loss
 
     def add_training_op(self, loss):
@@ -309,7 +329,7 @@ class RNNModel(NERModel):
             train_op: The Op for training.
         """
         ### YOUR CODE HERE (~1-2 lines)
-        ### END YOUR CODE
+        train_op = tf.train.AdamOptimizer(self.config.lr).minimize(loss)
         return train_op
 
     def preprocess_sequence_data(self, examples):
@@ -334,10 +354,18 @@ class RNNModel(NERModel):
         assert len(examples_raw) == len(examples)
         assert len(examples_raw) == len(preds)
 
+        # print '======='
+        # print "e", examples_raw[0]
+        # print "E", examples[0]
+        # print "P", preds[0]
+
         ret = []
         for i, (sentence, labels) in enumerate(examples_raw):
             _, _, mask = examples[i]
             labels_ = [l for l, m in zip(preds[i], mask) if m] # only select elements of mask.
+            labels = [l for l, m in zip(labels, mask) if m]
+            # print 'labels_', labels_
+            # print 'labels', labels
             assert len(labels_) == len(labels)
             ret.append([sentence, labels, labels_])
         return ret
