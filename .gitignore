@@ -1,6 +1,10 @@
 # data
 assignment3/data/
 
+# result
+assignment3/results/
+
+
 
 .DS_store
 ^*
